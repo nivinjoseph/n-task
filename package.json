@@ -1,0 +1,51 @@
+{
+    "name": "@nivinjoseph/n-task",
+    "version": "1.0.0",
+    "description": "Task parallelization for frontend and backend using web workers and worker threads",
+    "main": "./dist",
+    "types": "./dist",
+    "scripts": {
+        "ts-compile": "tsc -p .",
+        "ts-lint": "tslint -p . -c tslint.json",
+        "ts-build": "npm run ts-compile && npm run ts-lint",
+        "ts-build-dist": "npm run ts-build && tsc -p ./dist",
+        "clean-src": "find ./src -name '*.js' -delete -o -name '*.map' -delete",
+        "clean-test": "find ./test -name '*.js' -delete -o -name '*.map' -delete",
+        "pretest": "npm run ts-build",
+        "test": "mocha --timeout 100000  --reporter spec --ui tdd --require ts-node/register './test/**/*.test.js' || true",
+        "pretest-ci": "npm run pretest",
+        "test-ci": "mocha --reporter spec --ui tdd --require ts-node/register './test/**/*.test.js'",
+        "publish-package": "npm run ts-build-dist && git add . && git commit -m 'preparing to publish new version' && npm version patch && git push && npm publish --access=public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nivinjoseph/n-task.git"
+    },
+    "keywords": [
+        "task",
+        "worker",
+        "thread"
+    ],
+    "author": "NiviN",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/nivinjoseph/n-task/issues"
+    },
+    "homepage": "https://github.com/nivinjoseph/n-task#readme",
+    "devDependencies": {
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^12.12.17",
+        "mocha": "^6.2.2",
+        "ts-node": "^8.5.4",
+        "tslint": "^5.20.1",
+        "typescript": "^3.7.3",
+        "typescript-tslint-plugin": "^0.5.5"
+    },
+    "dependencies": {
+        "@babel/polyfill": "^7.7.0",
+        "@nivinjoseph/n-defensive": "^1.0.28",
+        "@nivinjoseph/n-exception": "^1.0.19",
+        "@nivinjoseph/n-ext": "^1.1.10",
+        "@nivinjoseph/n-util": "^1.0.37"
+    }
+}
