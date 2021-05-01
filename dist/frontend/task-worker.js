@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TaskWorker = void 0;
 require("@babel/polyfill");
 require("@nivinjoseph/n-ext");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
@@ -30,7 +31,8 @@ class TaskWorker {
                 try {
                     const result = this[type](...params);
                     if (result != null) {
-                        if (result.then && result.catch) {
+                        if (result.then && result.catch) // is promise
+                         {
                             const promise = result;
                             promise
                                 .then((v) => {
