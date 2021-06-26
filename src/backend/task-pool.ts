@@ -8,12 +8,10 @@ import { Worker } from "worker_threads";
 export class TaskPool implements Disposable
 {
     private readonly _taskWorkerFile: string;
-    // private readonly _callbacks: { [index: string]: { resolve: (value?: any) => void; reject: (reason?: any) => void } } = {};
     private readonly _count: number;
     private readonly _taskWorkers = new Array<TaskWorkerInstance>();
     private readonly _taskQueue = new Array<TaskItem>();
     private _isInitialized = false;
-    // private readonly _bp: BackgroundProcessor;
     private _disposePromise: Promise<any> | null = null;
     
     
@@ -82,7 +80,7 @@ export class TaskPool implements Disposable
         {
             const taskWorker = new TaskWorkerInstance(this._taskWorkerFile);
             taskWorker.initialize(this._onAvailable.bind(this));
-            this._taskWorkers.push();
+            this._taskWorkers.push(taskWorker);
         }, this._count);
     }
     
