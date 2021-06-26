@@ -20,7 +20,6 @@ class TaskPool {
         this._taskWorkers = new Array();
         this._taskQueue = new Array();
         this._isInitialized = false;
-        // private readonly _bp: BackgroundProcessor;
         this._disposePromise = null;
         n_defensive_1.given(taskWorkerFile, "taskWorkerFile").ensureHasValue().ensureIsString();
         this._taskWorkerFile = taskWorkerFile;
@@ -63,7 +62,7 @@ class TaskPool {
         n_util_1.Make.loop(() => {
             const taskWorker = new TaskWorkerInstance(this._taskWorkerFile);
             taskWorker.initialize(this._onAvailable.bind(this));
-            this._taskWorkers.push();
+            this._taskWorkers.push(taskWorker);
         }, this._count);
     }
     _onAvailable(twi) {
