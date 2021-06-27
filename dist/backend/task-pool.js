@@ -96,14 +96,14 @@ class TaskPool {
 exports.TaskPool = TaskPool;
 class TaskWorkerInstance {
     constructor(taskWorkerFile) {
-        this._availabilityObserver = null;
+        this._availabilityObserver = new n_util_1.Observer("available");
         this._disposePromise = null;
         this._currentTask = null;
         n_defensive_1.given(taskWorkerFile, "taskWorkerFile").ensureHasValue().ensureIsString();
         this._id = n_util_1.Uuid.create();
         this._worker = new worker_threads_1.Worker(taskWorkerFile);
     }
-    get _isInitialized() { return this._availabilityObserver != null; }
+    get _isInitialized() { return this._availabilityObserver.hasSubscriptions; }
     get _isDisposed() { return this._disposePromise != null; }
     get id() { return this._id; }
     get isBusy() { return this._currentTask != null; }
@@ -112,7 +112,7 @@ class TaskWorkerInstance {
         n_defensive_1.given(this, "this").ensure(t => !t._isInitialized, "already initialized");
         if (this._isDisposed)
             throw new n_exception_1.ObjectDisposedException(this);
-        this._availabilityObserver = new n_util_1.Observer("available", availabilityCallback);
+        this._availabilityObserver.subscribe(availabilityCallback);
         this._worker.on("message", (data) => {
             const id = data.id;
             const error = data.error;
@@ -130,7 +130,6 @@ class TaskWorkerInstance {
             this._currentTask = null;
             this._availabilityObserver.notify(this);
         });
-        return this._availabilityObserver.subscription;
     }
     execute(id, method, ...params) {
         n_defensive_1.given(id, "id").ensureHasValue().ensureIsString();
