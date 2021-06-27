@@ -1,6 +1,6 @@
 import "@nivinjoseph/n-ext";
 import { given } from "@nivinjoseph/n-defensive";
-import { Disposable, Uuid, Make, Deferred, Observer, Subscription } from "@nivinjoseph/n-util";
+import { Disposable, Uuid, Make, Deferred, Observer } from "@nivinjoseph/n-util";
 import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-exception";
 import { Worker } from "worker_threads";
 
@@ -138,11 +138,11 @@ class TaskWorkerInstance implements Disposable
 {
     private readonly _id: string;
     private readonly _worker: Worker;
-    private _availabilityObserver: Observer<this> | null = null;
+    private readonly _availabilityObserver = new Observer<this>("available");
     private _disposePromise: Promise<any> | null = null;
     private _currentTask: WorkerTask | null = null;
     
-    private get _isInitialized(): boolean { return this._availabilityObserver != null; }
+    private get _isInitialized(): boolean { return this._availabilityObserver.hasSubscriptions; }
     private get _isDisposed(): boolean { return this._disposePromise != null; }
     
     public get id(): string { return this._id; }
@@ -158,7 +158,7 @@ class TaskWorkerInstance implements Disposable
     }
     
     
-    public initialize(availabilityCallback: (twi: this) => void): Subscription
+    public initialize(availabilityCallback: (twi: this) => void): void
     {
         given(availabilityCallback, "availabilityCallback").ensureHasValue().ensureIsFunction();
         
@@ -167,7 +167,7 @@ class TaskWorkerInstance implements Disposable
         if (this._isDisposed)
             throw new ObjectDisposedException(this);
         
-        this._availabilityObserver = new Observer("available", availabilityCallback);
+        this._availabilityObserver.subscribe(availabilityCallback);
         
         this._worker.on("message", (data: any) =>
         {
@@ -191,8 +191,6 @@ class TaskWorkerInstance implements Disposable
             this._currentTask = null;
             this._availabilityObserver.notify(this);
         });
-        
-        return this._availabilityObserver.subscription;
     }
     
     public execute<T>(id: string, method: string, ...params: any[]): Promise<T>
