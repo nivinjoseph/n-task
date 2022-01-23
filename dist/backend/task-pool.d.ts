@@ -1,4 +1,3 @@
-import "@nivinjoseph/n-ext";
 import { Disposable } from "@nivinjoseph/n-util";
 export declare class TaskPool implements Disposable {
     private readonly _taskWorkerFile;
