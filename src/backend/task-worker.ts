@@ -15,17 +15,17 @@ export abstract class TaskWorker
 
         this._typeName = (<Object>this).getTypeName();
 
-        this.initialize();
+        this._initialize();
     }
 
 
-    private initialize(): void
+    private _initialize(): void
     {
         this._ctx.on("message", (data: any) =>
         {
             const id = data.id as string;
             const type = data.type as string;
-            const params = data.params as any[];
+            const params = data.params as Array<any>;
 
             try 
             {
@@ -45,6 +45,7 @@ export abstract class TaskWorker
             {
                 try 
                 {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     const result = (<any>this)[type](...params);
                     if (result != null)
                     {

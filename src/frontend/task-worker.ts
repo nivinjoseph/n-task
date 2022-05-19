@@ -9,24 +9,24 @@ export abstract class TaskWorker
     private readonly _typeName: string;
 
 
-    public constructor(ctx: any)
+    public constructor(ctx: Worker)
     {
         given(ctx, "ctx").ensureHasValue().ensureIsObject();
         this._ctx = ctx;
 
         this._typeName = (<Object>this).getTypeName();
 
-        this.initialize();
+        this._initialize();
     }
 
 
-    private initialize(): void
+    private _initialize(): void
     {
-        this._ctx.onmessage = (e: MessageEvent) =>
+        this._ctx.onmessage = (e: MessageEvent): void =>
         {
             const id = e.data.id as string;
             const type = e.data.type as string;
-            const params = e.data.params as any[];
+            const params = e.data.params as Array<any>;
 
             try 
             {
@@ -46,6 +46,7 @@ export abstract class TaskWorker
             {
                 try 
                 {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     const result = (<any>this)[type](...params);
                     if (result != null)
                     {

@@ -16,7 +16,7 @@ export class TaskPool implements Disposable
     private get _isDisposed(): boolean { return this._disposePromise != null; }
 
     
-    public constructor(taskWorker: Function, count: number = 1)
+    public constructor(taskWorker: Function, count = 1)
     {
         given(taskWorker, "taskWorker").ensureHasValue().ensureIsFunction();
         this._taskWorkerClass = taskWorker;
@@ -26,10 +26,10 @@ export class TaskPool implements Disposable
     }
 
 
-    public async initializeWorkers(initializerMethod?: string, ...initializerParams: any[]): Promise<void>
+    public async initializeWorkers(initializerMethod?: string, ...initializerParams: Array<any>): Promise<void>
     {
-        given(initializerMethod, "initializerMethod").ensureIsString();
-        given(initializerParams, "initializerParams").ensureIsArray().ensureIsArray();
+        given(initializerMethod as string, "initializerMethod").ensureIsString();
+        given(initializerParams, "initializerParams").ensureIsArray();
 
         given(this, "this").ensure(t => !t._isInitialized, "already initialized");
 
@@ -46,7 +46,7 @@ export class TaskPool implements Disposable
     }
 
 
-    public invoke<T>(method: string, ...params: any[]): Promise<T>
+    public async invoke<T>(method: string, ...params: Array<any>): Promise<T>
     {
         given(method, "method").ensureHasValue().ensureIsString();
         given(params, "params").ensureHasValue().ensureIsArray();
@@ -56,7 +56,7 @@ export class TaskPool implements Disposable
         if (this._isDisposed)
             throw new ObjectDisposedException(this);
 
-        return this._enqueue(method, params);
+        return this._enqueue(method, params) as Promise<T>;
     }
 
     public async dispose(): Promise<void>
@@ -89,7 +89,7 @@ export class TaskPool implements Disposable
         this._executeAvailableWork(twi);
     }
 
-    private _enqueue(method: string, params: any[]): Promise<any>
+    private _enqueue(method: string, params: Array<any>): Promise<any>
     {
         const taskItem: TaskItem = {
             id: Uuid.create(),
@@ -114,7 +114,7 @@ export class TaskPool implements Disposable
         if (availableWorker == null)
             return;
 
-        const work = this._taskQueue.pop();
+        const work = this._taskQueue.pop()!;
         availableWorker
             .execute(work.id, work.method, ...work.params)
             .then(t => work.deferred.resolve(t))
@@ -127,7 +127,7 @@ interface TaskItem
     id: string;
     deferred: Deferred<any>;
     method: string;
-    params: any[];
+    params: Array<any>;
 }
 
 
@@ -151,6 +151,7 @@ class TaskWorkerInstance implements Disposable
         given(taskWorkerClass, "taskWorkerClass").ensureHasValue().ensureIsFunction();
 
         this._id = Uuid.create();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         this._worker = new (<any>taskWorkerClass)();
     }
 
@@ -166,23 +167,23 @@ class TaskWorkerInstance implements Disposable
 
         this._availabilityObserver.subscribe(availabilityCallback);
 
-        this._worker.onmessage = (e: MessageEvent) =>
+        this._worker.onmessage = (e: MessageEvent): void =>
         {
             const id = e.data.id as string;
-            const error = e.data.error as any;
-            const result = e.data.result as any;
+            const error = e.data.error;
+            const result = e.data.result;
 
-            if (this._currentTask.id !== id)
+            if (this._currentTask!.id !== id)
             {
-                this._currentTask.deferred
+                this._currentTask!.deferred
                     .reject(new ApplicationException("Current task id does not match id of task result."));
             }
             else
             {
                 if (error != null)
-                    this._currentTask.deferred.reject(error);
+                    this._currentTask!.deferred.reject(error);
                 else
-                    this._currentTask.deferred.resolve(result);
+                    this._currentTask!.deferred.resolve(result);
             }
 
             this._currentTask = null;
@@ -190,7 +191,7 @@ class TaskWorkerInstance implements Disposable
         };
     }
 
-    public execute<T>(id: string, method: string, ...params: any[]): Promise<T>
+    public async execute<T>(id: string, method: string, ...params: Array<any>): Promise<T>
     {
         given(id, "id").ensureHasValue().ensureIsString();
         given(method, "method").ensureHasValue().ensureIsString();
@@ -214,10 +215,10 @@ class TaskWorkerInstance implements Disposable
             params
         });
 
-        return this._currentTask.deferred.promise;
+        return this._currentTask.deferred.promise as Promise<T>;
     }
 
-    public dispose(): Promise<void>
+    public async dispose(): Promise<void>
     {
         if (!this._isDisposed)
         {
