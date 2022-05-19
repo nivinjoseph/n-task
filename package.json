@@ -1,6 +1,6 @@
 {
     "name": "@nivinjoseph/n-task",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "description": "Task parallelization for frontend and backend using web workers and worker threads",
     "main": "./dist",
     "types": "./dist",
