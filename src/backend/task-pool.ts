@@ -1,7 +1,7 @@
 import { given } from "@nivinjoseph/n-defensive";
 import { Disposable, Uuid, Make, Deferred, Observer } from "@nivinjoseph/n-util";
 import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-exception";
-import { Worker } from "worker_threads";
+import { Worker } from "node:worker_threads";
 
 
 export class TaskPool implements Disposable
