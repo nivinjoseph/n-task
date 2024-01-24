@@ -25,7 +25,6 @@
         "clean-dist": "find ./dist -name '*.js' -delete -o -name '*.map' -delete -o -name '*.ts' -delete",
         "clean-all": "yarn clean-src && yarn clean-test && yarn clean-dist",
         "test": "yarn ts-build && node --test --enable-source-maps ./test/**/*.test.js",
-        
         "publish-package": "yarn ts-build-dist && git add . && git commit -m 'preparing to publish new version' && npm version patch && git push && npm publish --access=public"
     },
     "repository": {
@@ -57,7 +56,7 @@
         "@nivinjoseph/n-exception": "^2.0.1",
         "@nivinjoseph/n-ext": "^2.0.1",
         "@nivinjoseph/n-util": "^2.0.1",
-        "core-js": "^3.35.0",
+        "core-js": "^3.35.1",
         "regenerator-runtime": "^0.14.1"
     },
     "engineStrict": true,
