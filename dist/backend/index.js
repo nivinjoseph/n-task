@@ -1,9 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskPool = exports.TaskWorker = void 0;
-require("@nivinjoseph/n-ext");
-const task_worker_1 = require("./task-worker");
-Object.defineProperty(exports, "TaskWorker", { enumerable: true, get: function () { return task_worker_1.TaskWorker; } });
-const task_pool_1 = require("./task-pool");
-Object.defineProperty(exports, "TaskPool", { enumerable: true, get: function () { return task_pool_1.TaskPool; } });
+import "@nivinjoseph/n-ext";
+import { TaskWorker } from "./task-worker.js";
+import { TaskPool } from "./task-pool.js";
+export { TaskWorker, TaskPool };
 //# sourceMappingURL=index.js.map

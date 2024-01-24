@@ -16,3 +16,4 @@ export declare class TaskPool implements Disposable {
     private _enqueue;
     private _executeAvailableWork;
 }
+//# sourceMappingURL=task-pool.d.ts.map

@@ -1,4 +1,5 @@
-import "@babel/polyfill";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 import "@nivinjoseph/n-ext";
 export declare abstract class TaskWorker {
     private readonly _ctx;
@@ -6,3 +7,4 @@ export declare abstract class TaskWorker {
     constructor(ctx: Worker);
     private _initialize;
 }
+//# sourceMappingURL=task-worker.d.ts.map

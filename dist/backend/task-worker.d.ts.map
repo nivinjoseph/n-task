@@ -1,0 +1,1 @@
+{"version":3,"file":"task-worker.d.ts","sourceRoot":"","sources":["../../src/backend/task-worker.ts"],"names":[],"mappings":"AAAA,OAAO,oBAAoB,CAAC;AAK5B,8BAAsB,UAAU;IAE5B,OAAO,CAAC,QAAQ,CAAC,IAAI,CAAc;IACnC,OAAO,CAAC,QAAQ,CAAC,SAAS,CAAS;;IAanC,OAAO,CAAC,WAAW;CAkFtB"}

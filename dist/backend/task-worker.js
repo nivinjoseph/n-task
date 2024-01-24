@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskWorker = void 0;
-require("@nivinjoseph/n-ext");
-const n_defensive_1 = require("@nivinjoseph/n-defensive");
-const worker_threads_1 = require("worker_threads");
-class TaskWorker {
+import "@nivinjoseph/n-ext";
+import { given } from "@nivinjoseph/n-defensive";
+import { parentPort } from "node:worker_threads";
+export class TaskWorker {
     constructor() {
-        this._ctx = worker_threads_1.parentPort;
+        this._ctx = parentPort;
         this._typeName = this.getTypeName();
         this._initialize();
     }
@@ -16,9 +13,9 @@ class TaskWorker {
             const type = data.type;
             const params = data.params;
             try {
-                (0, n_defensive_1.given)(id, "id").ensureHasValue().ensureIsString();
-                (0, n_defensive_1.given)(type, "type").ensureHasValue().ensureIsString();
-                (0, n_defensive_1.given)(params, "params").ensureHasValue().ensureIsArray();
+                given(id, "id").ensureHasValue().ensureIsString();
+                given(type, "type").ensureHasValue().ensureIsString();
+                given(params, "params").ensureHasValue().ensureIsArray();
             }
             catch (error) {
                 this._ctx.postMessage({
@@ -78,5 +75,4 @@ class TaskWorker {
         });
     }
 }
-exports.TaskWorker = TaskWorker;
 //# sourceMappingURL=task-worker.js.map

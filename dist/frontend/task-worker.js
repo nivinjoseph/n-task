@@ -1,12 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskWorker = void 0;
-require("@babel/polyfill");
-require("@nivinjoseph/n-ext");
-const n_defensive_1 = require("@nivinjoseph/n-defensive");
-class TaskWorker {
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import "@nivinjoseph/n-ext";
+import { given } from "@nivinjoseph/n-defensive";
+export class TaskWorker {
     constructor(ctx) {
-        (0, n_defensive_1.given)(ctx, "ctx").ensureHasValue().ensureIsObject();
+        given(ctx, "ctx").ensureHasValue().ensureIsObject();
         this._ctx = ctx;
         this._typeName = this.getTypeName();
         this._initialize();
@@ -17,9 +15,9 @@ class TaskWorker {
             const type = e.data.type;
             const params = e.data.params;
             try {
-                (0, n_defensive_1.given)(id, "id").ensureHasValue().ensureIsString();
-                (0, n_defensive_1.given)(type, "type").ensureHasValue().ensureIsString();
-                (0, n_defensive_1.given)(params, "params").ensureHasValue().ensureIsArray();
+                given(id, "id").ensureHasValue().ensureIsString();
+                given(type, "type").ensureHasValue().ensureIsString();
+                given(params, "params").ensureHasValue().ensureIsArray();
             }
             catch (error) {
                 this._ctx.postMessage({
@@ -79,5 +77,4 @@ class TaskWorker {
         };
     }
 }
-exports.TaskWorker = TaskWorker;
 //# sourceMappingURL=task-worker.js.map

@@ -5,3 +5,4 @@ export declare abstract class TaskWorker {
     constructor();
     private _initialize;
 }
+//# sourceMappingURL=task-worker.d.ts.map
