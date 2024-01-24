@@ -1,6 +1,6 @@
 import "@nivinjoseph/n-ext";
 import { given } from "@nivinjoseph/n-defensive";
-import { parentPort, MessagePort } from "worker_threads";
+import { parentPort, MessagePort } from "node:worker_threads";
 
 
 export abstract class TaskWorker
