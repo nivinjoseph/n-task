@@ -5,6 +5,7 @@ import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-ex
 
 export class TaskPool implements Disposable
 {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     private readonly _taskWorkerClass: Function;
     private readonly _count: number;
     private readonly _taskWorkers = new Array<TaskWorkerInstance>();
@@ -16,6 +17,7 @@ export class TaskPool implements Disposable
     private get _isDisposed(): boolean { return this._disposePromise != null; }
 
     
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     public constructor(taskWorker: Function, count = 1)
     {
         given(taskWorker, "taskWorker").ensureHasValue().ensureIsFunction();
@@ -69,6 +71,7 @@ export class TaskPool implements Disposable
             this._disposePromise = Promise.all(this._taskWorkers.map(t => t.dispose()));
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
 
@@ -146,6 +149,7 @@ class TaskWorkerInstance implements Disposable
     public get isBusy(): boolean { return this._currentTask != null; }
 
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     public constructor(taskWorkerClass: Function)
     {
         given(taskWorkerClass, "taskWorkerClass").ensureHasValue().ensureIsFunction();
@@ -227,6 +231,7 @@ class TaskWorkerInstance implements Disposable
             this._disposePromise = Promise.resolve();
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
 }

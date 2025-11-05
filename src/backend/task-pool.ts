@@ -70,6 +70,7 @@ export class TaskPool implements Disposable
             this._disposePromise = Promise.all(this._taskWorkers.map(t => t.dispose()));
         }
         
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
 
