@@ -3,6 +3,7 @@ import { Uuid, Make, Observer, Deferred } from "@nivinjoseph/n-util";
 import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-exception";
 export class TaskPool {
     get _isDisposed() { return this._disposePromise != null; }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     constructor(taskWorker, count = 1) {
         this._taskWorkers = new Array();
         this._taskQueue = new Array();
@@ -38,6 +39,7 @@ export class TaskPool {
             this._taskQueue.clear();
             this._disposePromise = Promise.all(this._taskWorkers.map(t => t.dispose()));
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
     _createWorkers() {
@@ -80,6 +82,7 @@ class TaskWorkerInstance {
     get _isDisposed() { return this._disposePromise != null; }
     get id() { return this._id; }
     get isBusy() { return this._currentTask != null; }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     constructor(taskWorkerClass) {
         this._availabilityObserver = new Observer("available");
         this._disposePromise = null;
@@ -139,6 +142,7 @@ class TaskWorkerInstance {
             this._worker.terminate();
             this._disposePromise = Promise.resolve();
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
 }

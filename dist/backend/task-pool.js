@@ -39,6 +39,7 @@ export class TaskPool {
             this._taskQueue.clear();
             this._disposePromise = Promise.all(this._taskWorkers.map(t => t.dispose()));
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._disposePromise;
     }
     _createWorkers() {
