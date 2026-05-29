@@ -1,10 +1,13 @@
 {
     "compilerOptions": {
         "module": "NodeNext",
-        "target": "ES2017",
+        "target": "ES2023",
         "lib": [
             "ES2023",
             "WebWorker"
+        ],
+        "types": [
+            "node"
         ],
         "strict": true,
         "strictNullChecks": true,
