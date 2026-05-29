@@ -39,6 +39,8 @@ export abstract class TaskWorker
                     id,
                     error: error || true
                 });
+
+                return;
             }
 
             if ((<any>this)[type] && typeof (<any>this)[type] === "function")
