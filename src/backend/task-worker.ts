@@ -1,118 +1,34 @@
-import "@nivinjoseph/n-ext";
-import { given } from "@nivinjoseph/n-defensive";
 import { parentPort, MessagePort } from "node:worker_threads";
+import { TaskWorker as TaskWorkerBase, WorkerContext } from "../common/task-worker.js";
 
 
-function toError(error: unknown): Error
+export abstract class TaskWorker extends TaskWorkerBase
 {
-    if (error instanceof Error)
-        return error;
-
-    if (typeof error === "string" && error.length > 0)
-        return new Error(error);
-
-    return new Error(`Worker task failed with a non-error value: ${String(error)}`);
+    public constructor()
+    {
+        super(new NodeWorkerContext(parentPort as MessagePort));
+    }
 }
 
 
-export abstract class TaskWorker
+class NodeWorkerContext implements WorkerContext
 {
-    private readonly _ctx: MessagePort;
-    private readonly _typeName: string;
+    private readonly _port: MessagePort;
 
 
-    public constructor()
+    public constructor(port: MessagePort)
     {
-        this._ctx = parentPort as MessagePort;
-
-        this._typeName = (<Object>this).getTypeName();
-
-        this._initialize();
+        this._port = port;
     }
 
 
-    private _initialize(): void
+    public onMessage(handler: (data: any) => void): void
     {
-        this._ctx.on("message", (data: any) =>
-        {
-            const id = data.id as string;
-            const type = data.type as string;
-            const params = data.params as Array<any>;
+        this._port.on("message", handler);
+    }
 
-            try 
-            {
-                given(id, "id").ensureHasValue().ensureIsString();
-                given(type, "type").ensureHasValue().ensureIsString();
-                given(params, "params").ensureHasValue().ensureIsArray();
-            }
-            catch (error)
-            {
-                this._ctx.postMessage({
-                    id,
-                    error: toError(error)
-                });
-
-                return;
-            }
-
-            if ((<any>this)[type] && typeof (<any>this)[type] === "function")
-            {
-                try 
-                {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                    const result = (<any>this)[type](...params);
-                    if (result != null)
-                    {
-                        if (result.then && result.catch) // is promise
-                        {
-                            const promise = result as Promise<any>;
-                            promise
-                                .then((v) =>
-                                {
-                                    this._ctx.postMessage({
-                                        id,
-                                        result: v
-                                    });
-                                })
-                                .catch(e =>
-                                {
-                                    this._ctx.postMessage({
-                                        id,
-                                        error: toError(e)
-                                    });
-                                });
-                        }
-                        else
-                        {
-                            this._ctx.postMessage({
-                                id,
-                                result
-                            });
-                        }
-                    }
-                    else
-                    {
-                        this._ctx.postMessage({
-                            id,
-                            result
-                        });
-                    }
-                }
-                catch (error)
-                {
-                    this._ctx.postMessage({
-                        id,
-                        error: toError(error)
-                    });
-                }
-            }
-            else
-            {
-                this._ctx.postMessage({
-                    id,
-                    error: toError(`Method '${type}' not implemented in TaskWorker '${this._typeName}'`)
-                });
-            }
-        });
+    public postMessage(message: any): void
+    {
+        this._port.postMessage(message);
     }
 }
