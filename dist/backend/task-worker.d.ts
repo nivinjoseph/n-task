@@ -1,8 +1,5 @@
-import "@nivinjoseph/n-ext";
-export declare abstract class TaskWorker {
-    private readonly _ctx;
-    private readonly _typeName;
+import { TaskWorker as TaskWorkerBase } from "../common/task-worker.js";
+export declare abstract class TaskWorker extends TaskWorkerBase {
     constructor();
-    private _initialize;
 }
 //# sourceMappingURL=task-worker.d.ts.map
