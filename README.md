@@ -222,6 +222,26 @@ Abstract base class you extend to define a worker. Each public method is callabl
 - **Backend**: `new MyWorker()` at the bottom of the worker module (no constructor argument).
 - **Frontend**: `new MyWorker(self as unknown as Worker)` at the bottom of the worker module.
 
+## Development
+
+Requires Node.js >= 20. A pinned Yarn release ships in the repo, so `corepack enable` is all you need.
+
+```bash
+yarn install        # install dependencies
+yarn ts-build       # type-check + lint the library
+yarn test           # backend tests (Node worker threads)
+yarn test-browser   # frontend smoke test in a real browser
+```
+
+`yarn test-browser` is self-contained: it builds the library, downloads a headless Chromium on
+first run (via Playwright, cached afterwards), starts a Vite dev server to bundle the worker, and
+drives the frontend `TaskPool` end-to-end in the browser.
+
+> On Linux CI you may also need the browser's system libraries:
+> ```bash
+> yarn playwright install --with-deps chromium
+> ```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

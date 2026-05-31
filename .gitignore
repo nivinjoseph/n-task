@@ -70,6 +70,11 @@ src/**/*.map
 test/**/*.js
 test/**/*.map
 
+# Playwright (browser smoke tests)
+test-results/
+playwright-report/
+.playwright/
+
 
 .pnp.*
 .yarn/*

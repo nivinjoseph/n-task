@@ -25,6 +25,7 @@
         "clean-dist": "find ./dist -name '*.js' -delete -o -name '*.map' -delete -o -name '*.ts' -delete",
         "clean-all": "yarn clean-src && yarn clean-test && yarn clean-dist",
         "test": "yarn ts-build && node --test --enable-source-maps ./test/**/*.test.js",
+        "test-browser": "yarn ts-build && playwright install chromium && playwright test --config test/browser/playwright.config.ts",
         "publish-package": "yarn ts-build-dist && git add . && git commit -m 'preparing to publish new version' && yarn version patch && git add . && git commit -m 'new version' && git push && npm publish --access=public"
     },
     "repository": {
@@ -44,18 +45,20 @@
     "homepage": "https://github.com/nivinjoseph/n-task#readme",
     "devDependencies": {
         "@eslint/js": "10.0.1",
+        "@playwright/test": "1.49.1",
         "@stylistic/eslint-plugin": "5.10.0",
         "@types/node": "24.10",
         "eslint": "10.2.1",
         "eslint-import-resolver-typescript": "4.4.4",
         "eslint-plugin-import": "2.32.0",
         "typescript": "6.0.3",
-        "typescript-eslint": "8.58.2"
+        "typescript-eslint": "8.58.2",
+        "vite": "6.0.7"
     },
     "dependencies": {
         "@nivinjoseph/n-defensive": "2.0.3",
         "@nivinjoseph/n-exception": "2.0.3",
         "@nivinjoseph/n-ext": "2.0.5",
-        "@nivinjoseph/n-util": "4.0.1"
+        "@nivinjoseph/n-util": "4.0.2"
     }
 }

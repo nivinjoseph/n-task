@@ -11,7 +11,7 @@ export default defineConfig(
     tsEslint.configs.recommended,
     importPlugin.flatConfigs.recommended,
     {
-        ignores: ["dist/**", "node_modules/**", "**/*.js", "**/*.map", "**/*.d.ts"]
+        ignores: ["dist/**", "node_modules/**", "test/browser/**", "**/*.js", "**/*.map", "**/*.d.ts"]
     },
     {
         files: ["**/*.ts"],
