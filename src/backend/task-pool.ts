@@ -64,7 +64,7 @@ export class TaskPool implements Disposable
     {
         if (!this._isDisposed)
         {
-            this._taskQueue.forEach(t => t.deferred.reject("disposed"));
+            this._taskQueue.forEach(t => t.deferred.reject(new ObjectDisposedException(this)));
             this._taskQueue.clear();
 
             this._disposePromise = Promise.all(this._taskWorkers.map(t => t.dispose()));
@@ -112,7 +112,7 @@ export class TaskPool implements Disposable
         if (this._taskQueue.isEmpty)
             return;
         
-        const availableWorker = twi ?? this._taskWorkers.find(t => !t.isBusy);
+        const availableWorker = twi ?? this._taskWorkers.find(t => t.isAvailable);
         if (availableWorker == null)
             return;
         
@@ -141,12 +141,15 @@ class TaskWorkerInstance implements Disposable
     private readonly _availabilityObserver = new Observer<this>("available");
     private _disposePromise: Promise<any> | null = null;
     private _currentTask: WorkerTask | null = null;
-    
+    private _isFaulted = false;
+
     private get _isInitialized(): boolean { return this._availabilityObserver.hasSubscriptions; }
     private get _isDisposed(): boolean { return this._disposePromise != null; }
-    
+
     public get id(): string { return this._id; }
     public get isBusy(): boolean { return this._currentTask != null; }
+    public get isFaulted(): boolean { return this._isFaulted; }
+    public get isAvailable(): boolean { return !this._isFaulted && !this._isDisposed && !this.isBusy; }
     
     
     public constructor(taskWorkerFile: string)
@@ -171,25 +174,38 @@ class TaskWorkerInstance implements Disposable
         
         this._worker.on("message", (data: any) =>
         {
+            if (this._currentTask == null)
+                return;
+
             const id = data.id as string;
             const error = data.error;
             const result = data.result;
 
-            if (this._currentTask!.id !== id)
+            if (this._currentTask.id !== id)
             {
-                this._currentTask!.deferred
+                this._currentTask.deferred
                     .reject(new ApplicationException("Current task id does not match id of task result."));
             }
             else
             {
                 if (error != null)
-                    this._currentTask!.deferred.reject(error);
+                    this._currentTask.deferred.reject(error);
                 else
-                    this._currentTask!.deferred.resolve(result);
+                    this._currentTask.deferred.resolve(result);
             }
 
             this._currentTask = null;
             this._availabilityObserver.notify(this);
+        });
+
+        this._worker.on("error", (error: Error) =>
+        {
+            this._onError(new ApplicationException("Worker thread errored.", error));
+        });
+
+        this._worker.on("exit", (code: number) =>
+        {
+            this._onError(new ApplicationException(`Worker thread exited unexpectedly with code ${code}.`));
         });
     }
     
@@ -224,11 +240,35 @@ class TaskWorkerInstance implements Disposable
     {
         if (!this._isDisposed)
         {
+            if (this._currentTask != null)
+            {
+                this._currentTask.deferred.reject(new ObjectDisposedException(this));
+                this._currentTask = null;
+            }
+
             this._availabilityObserver.cancel();
             this._disposePromise = this._worker.terminate();
         }
-        
+
         return this._disposePromise as Promise<void>;
+    }
+
+    private _onError(error: Error): void
+    {
+        if (this._isFaulted || this._isDisposed)
+            return;
+
+        this._isFaulted = true;
+
+        if (this._currentTask != null)
+        {
+            this._currentTask.deferred.reject(error);
+            this._currentTask = null;
+        }
+
+        this._availabilityObserver.cancel();
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        this._worker.terminate();
     }
 }
 

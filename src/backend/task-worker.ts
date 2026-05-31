@@ -3,6 +3,18 @@ import { given } from "@nivinjoseph/n-defensive";
 import { parentPort, MessagePort } from "node:worker_threads";
 
 
+function toError(error: unknown): Error
+{
+    if (error instanceof Error)
+        return error;
+
+    if (typeof error === "string" && error.length > 0)
+        return new Error(error);
+
+    return new Error(`Worker task failed with a non-error value: ${String(error)}`);
+}
+
+
 export abstract class TaskWorker
 {
     private readonly _ctx: MessagePort;
@@ -37,7 +49,7 @@ export abstract class TaskWorker
             {
                 this._ctx.postMessage({
                     id,
-                    error: error || true
+                    error: toError(error)
                 });
 
                 return;
@@ -66,7 +78,7 @@ export abstract class TaskWorker
                                 {
                                     this._ctx.postMessage({
                                         id,
-                                        error: e || true
+                                        error: toError(e)
                                     });
                                 });
                         }
@@ -90,7 +102,7 @@ export abstract class TaskWorker
                 {
                     this._ctx.postMessage({
                         id,
-                        error: error || true
+                        error: toError(error)
                     });
                 }
             }
@@ -98,7 +110,7 @@ export abstract class TaskWorker
             {
                 this._ctx.postMessage({
                     id,
-                    error: `Method '${type}' not implemented in TaskWorker '${this._typeName}'`
+                    error: toError(`Method '${type}' not implemented in TaskWorker '${this._typeName}'`)
                 });
             }
         });
